@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>李东霖 - 2026 Work Performance Report</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 React 和 ReactDOM (UMD版本) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  
+  <!-- 引入 Babel 用于在浏览器中实时编译 JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* 全局重置基础样式，防止浏览器默认间距影响 */
+    body, html { margin: 0; padding: 0; background-color: #09090B; overflow-x: hidden; }
+  </style>
+</head>
+<body>
+  <!-- React 应用挂载点 -->
+  <div id="root"></div>
+
+  <!-- React 业务逻辑代码 -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- 重写图标组件 (替代 lucide-react，便于单文件无依赖运行) ---
+    const MousePointer2 = ({ size = 24, color = "currentColor", fill = "none", className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m4 4 7.07 17 2.51-7.39L21 11.07z"/></svg>
+    );
+    const ChevronDown = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>
+    );
+    const Upload = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+    );
+    const X = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    );
+    const Plus = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    );
+
+    // --- 配置与颜色常量 ---
+    const COLORS = {
+      purple: '#D946EF',
+      cyan: '#06B6D4',
+    };
+
+    // --- 基础组件：流体渐变背景 ---
+    const FluidBackground = ({ time }) => {
+      return (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute inset-0 opacity-40 filter blur-[120px]">
+            <div
+              className="absolute top-1/2 left-1/2 w-[70vw] h-[70vh] bg-blue-800 rounded-full"
+              style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.6) * 25}vw, ${Math.cos(time * 0.8) * 20}vh) scale(${1 + Math.sin(time * 1.0) * 0.2})` }}
+            />
+            <div
+              className="absolute top-1/2 left-1/2 w-[60vw] h-[60vh] bg-purple-800 rounded-full"
+              style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 0.8) * -20}vw, ${Math.sin(time * 0.6) * 25}vh) scale(${1 + Math.cos(time * 0.8) * 0.1})` }}
+            />
+            <div
+              className="absolute top-1/2 left-1/2 w-[65vw] h-[65vh] bg-red-800 rounded-full"
+              style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.4) * 30}vw, ${Math.cos(time * 1.0) * -25}vh) scale(${1 + Math.sin(time * 0.3) * 0.15})` }}
+            />
+            <div
+              className="absolute top-1/2 left-1/2 w-[55vw] h-[55vh] bg-orange-800 rounded-full"
+              style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 1.0) * -30}vw, ${Math.sin(time * 0.4) * -20}vh) scale(${1 + Math.cos(time * 0.8) * 0.2})` }}
+            />
+          </div>
+        </div>
+      );
+    };
+
+    // --- 基础组件：背景网格 ---
+    const GridBackground = () => (
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div 
+          className="absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, #333 1px, transparent 1px),
+              linear-gradient(to bottom, #333 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px'
+          }}
+        />
+      </div>
+    );
+
+    // --- 基础组件：Figma风格选中框 ---
+    const BoundingBox = ({ children, color, active = false }) => (
+      <div className={`relative inline-block transition-colors duration-300 ${active ? 'ring-1' : ''}`} style={{ ringColor: color }}>
+        {children}
+        {active && (
+          <React.Fragment>
+            <div className="absolute -top-1 -left-1 w-2 h-2 bg-white" style={{ border: `1px solid ${color}` }}></div>
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-white" style={{ border: `1px solid ${color}` }}></div>
+            <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white" style={{ border: `1px solid ${color}` }}></div>
+            <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-white" style={{ border: `1px solid ${color}` }}></div>
+          </React.Fragment>
+        )}
+      </div>
+    );
+
+    // --- 微件1：钢笔工具绘制路径 ---
+    const PenToolWidget = ({ time }) => {
+      const offset = Math.sin(time * 2); 
+      const cx = 80 + offset * 40; 
+      const cy = 30 + Math.cos(time * 2) * 20; 
+
+      return (
+        <div className="absolute top-[20%] left-[10%] z-10 w-[160px]">
+          <div className="text-zinc-500 font-mono text-[10px] mb-2">Pen Tool</div>
+          <div className="relative w-full h-[100px]">
+            <svg width="160" height="100" className="overflow-visible absolute top-0 left-0 z-0">
+              <path 
+                d={`M 20 80 C 60 80, ${cx} ${cy}, 140 80`}
+                fill="transparent" 
+                stroke="#06B6D4" 
+                strokeWidth="2" 
+              />
+              <line x1="140" y1="80" x2={cx} y2={cy} stroke="#71717A" strokeWidth="1" strokeDasharray="2 2" />
+              <rect x="17" y="77" width="6" height="6" fill="white" stroke="#06B6D4" strokeWidth="1.5" />
+              <rect x="137" y="77" width="6" height="6" fill="white" stroke="#06B6D4" strokeWidth="1.5" />
+              <circle cx={cx} cy={cy} r="4" fill="white" stroke="#06B6D4" strokeWidth="1.5" />
+            </svg>
+            <div 
+              className="absolute pointer-events-none z-10" 
+              style={{ left: cx, top: cy, transform: 'translate(-2px, -2px)' }}
+            >
+              <MousePointer2 size={18} color="#06B6D4" fill="#06B6D4" className="-rotate-12 drop-shadow-md" />
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 微件2：矩形数值输入 ---
+    const RectangleInputWidget = ({ time }) => {
+      const cycle = time % 4; 
+      let text = "";
+      if (cycle < 0.5) text = "19";
+      else if (cycle < 0.8) text = "192";
+      else if (cycle < 2.0) text = "1920";
+      else if (cycle < 2.3) text = "192";
+      else if (cycle < 2.5) text = "19";
+      else if (cycle < 2.7) text = "1";
+      else text = "";
+
+      const isBlinking = (time * 2) % 1 > 0.5;
+
+      return (
+        <div className="absolute bottom-[20%] left-[15%] z-20 font-mono text-xs">
+          <div className="bg-white/[0.08] backdrop-blur-[2px] border border-white/20 rounded-md p-3 w-40 shadow-lg">
+            <div className="flex justify-between items-center text-zinc-300 mb-3 text-[10px]">
+              <span>Rectangle 1</span>
+            </div>
+            <div className="flex gap-2 mb-2">
+              <div className="bg-transparent border border-white/10 px-2 py-1.5 rounded w-full flex items-center text-white relative ring-1 ring-cyan-500/50">
+                <span className="text-zinc-400 w-4">W</span>
+                <span>{text}</span>
+                <span className={`w-[2px] h-3.5 bg-cyan-400 ml-[1px] ${isBlinking ? 'opacity-100' : 'opacity-0'}`} />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <div className="bg-transparent border border-white/10 px-2 py-1.5 rounded w-full flex items-center text-zinc-300">
+                <span className="text-zinc-400 w-4">H</span>
+                <span>1080</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 微件3：渐变滑块调整 ---
+    const GradientWidget = ({ time }) => {
+      const progress = (Math.sin(time * 1.5) + 1) / 2; 
+      const trackWidth = 152; 
+      const thumbX = progress * (trackWidth - 16); 
+      
+      const color1 = '#D946EF'; 
+      const color2 = '#06B6D4'; 
+
+      return (
+        <div className="absolute bottom-[20%] right-[15%] z-20 font-mono text-xs">
+          <div className="bg-white/[0.08] backdrop-blur-[2px] border border-white/20 p-3 rounded-md w-44 shadow-lg">
+            <div className="text-[10px] text-zinc-300 mb-3 flex justify-between">
+              <span>Fill</span>
+              <span>Linear</span>
+            </div>
+            
+            <div 
+              className="h-6 w-full rounded-sm mb-4 border border-white/15 shadow-inner opacity-90" 
+              style={{ background: `linear-gradient(to right, ${color1} ${progress * 100}%, ${color2})` }} 
+            />
+            
+            <div className="relative h-2 bg-black/30 border border-white/10 rounded-full w-full mx-auto">
+              <div className="absolute top-1/2 -mt-2 -ml-2 w-4 h-4 bg-white rounded-full border-[3px] border-purple-500 shadow-md z-10" style={{ left: 0 }} />
+              <div className="absolute top-1/2 -mt-2 -ml-2 w-4 h-4 bg-white rounded-full border-[3px] border-cyan-500 shadow-md z-20" style={{ left: thumbX }} />
+              <div 
+                className="absolute pointer-events-none z-30" 
+                style={{ left: thumbX, top: 4, transform: 'translate(-2px, -2px)' }}
+              >
+                <MousePointer2 size={18} color="#06B6D4" fill="#06B6D4" className="-rotate-12 drop-shadow-md" />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 重写：作品集大图垂直展示板块 ---
+    const PortfolioWorksSection = () => {
+      const [works, setWorks] = useState([]);
+      const fileInputRef = useRef(null);
+
+      const handleUpload = (e) => {
+        const files = Array.from(e.target.files);
+        const newWorks = files.map(file => ({
+          id: Math.random().toString(36).substr(2, 9),
+          url: URL.createObjectURL(file),
+          name: file.name
+        }));
+        setWorks(prev => [...prev, ...newWorks]);
+      };
+
+      const removeWork = (id) => {
+        setWorks(prev => prev.filter(w => w.id !== id));
+      };
+
+      return (
+        <div className="relative z-10 w-3/4 mx-auto pt-4 pb-32 min-h-screen">
+          {/* 标题控制栏：上移并与箭头呼应 */}
+          <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
+            <div>
+              <h2 className="text-white text-3xl font-black tracking-tighter mb-2">SELECTED WORKS</h2>
+              <p className="text-zinc-500 font-mono text-xs uppercase tracking-[0.3em]">Exhibition / Portfolio / 2026</p>
+            </div>
+          </div>
+
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleUpload} 
+            multiple 
+            accept="image/*" 
+            className="hidden" 
+          />
+
+          {/* 作品列表：间隙调整为精确的 5px，移除文字说明 */}
+          <div className="flex flex-col gap-[5px]">
+            {works.map((work) => (
+              <div key={work.id} className="relative group w-full">
+                {/* 16:9 展示容器 */}
+                <div className="bg-white/[0.08] backdrop-blur-[2px] border border-white/15 rounded-xl aspect-video overflow-hidden flex items-center justify-center relative ring-1 ring-white/5 group-hover:ring-cyan-500/50 transition-all duration-700">
+                  <img 
+                    src={work.url} 
+                    alt={work.name} 
+                    className="w-full h-full object-contain transition-transform duration-1000 group-hover:scale-[1.01]" 
+                  />
+                  
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[1px]">
+                    <button 
+                      onClick={() => removeWork(work.id)}
+                      className="p-4 bg-red-500/80 rounded-full text-white hover:bg-red-500 transition-colors shadow-2xl scale-90 group-hover:scale-100 duration-300"
+                    >
+                      <X size={24} />
+                    </button>
+                  </div>
+
+                  {/* 装饰性标签，不再显示文件名 */}
+                  <div className="absolute bottom-4 left-6 px-3 py-1 bg-black/60 backdrop-blur-md rounded-sm text-[10px] font-mono text-zinc-400 border border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    DISPLAY_FRAME / 16:9
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* 延续上传按钮：间隙同样为 5px */}
+            <div 
+              className="group relative w-full aspect-video border-2 border-dashed border-white/5 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-500 hover:bg-white/[0.03] hover:border-cyan-500/30"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <div className="w-16 h-16 rounded-full bg-white/[0.05] flex items-center justify-center mb-6 ring-1 ring-white/10 group-hover:ring-cyan-500/50 group-hover:scale-110 transition-all duration-500">
+                <Plus className="text-zinc-500 group-hover:text-cyan-400" size={32} />
+              </div>
+              <p className="text-zinc-600 font-mono text-xs tracking-[0.3em] uppercase transition-colors group-hover:text-zinc-300">
+                {works.length > 0 ? "Add Next Work" : "Upload First Masterpiece"}
+              </p>
+            </div>
+          </div>
+
+          {/* 底部装饰信息 */}
+          <div className="mt-32 flex justify-between items-center text-zinc-700 font-mono text-[10px] uppercase tracking-[0.4em] border-t border-white/5 pt-12">
+            <span>Displaying {works.length} Items</span>
+            <span>Portfolio 2026 Production</span>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 主应用 ---
+    function App() {
+      const [time, setTime] = useState(0);
+
+      useEffect(() => {
+        let req;
+        const startTime = Date.now();
+        const tick = () => {
+          setTime((Date.now() - startTime) / 1000);
+          req = requestAnimationFrame(tick);
+        };
+        req = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(req);
+      }, []);
+
+      const cycleTime = time % 3;
+      const titleChars = ['述', '职', '报', '告'];
+      let cursorIndex = Math.floor(cycleTime / 0.25);
+      if (cursorIndex > 4) cursorIndex = 4;
+      if (cycleTime >= 2.5) cursorIndex = -1;
+
+      const scrollToWorks = () => {
+        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+      };
+
+      return (
+        <div className="relative w-full bg-[#09090B] selection:bg-purple-500/30 overflow-x-hidden scroll-smooth">
+          <FluidBackground time={time} />
+          <GridBackground />
+
+          {/* --- 第一屏：Hero 动画 --- */}
+          <section className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+            
+            <div className="absolute top-6 left-8 flex items-center gap-3 z-20">
+              <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                <div className="w-2.5 h-2.5 rounded-full bg-black"></div>
+              </div>
+              <span className="text-white font-bold tracking-tight text-lg">Donglin.</span>
+            </div>
+
+            <div className="absolute top-6 right-8 text-right z-20 hidden md:block">
+              <div className="text-zinc-500 font-mono text-[10px] uppercase tracking-widest">
+                Version 1.0<br/>
+                Interactive Mode
+              </div>
+            </div>
+
+            <div className="relative z-10 pointer-events-none text-center">
+              <div className="text-zinc-500 font-mono text-xs md:text-sm tracking-[0.2em] mb-4 uppercase">
+                Building the Design Future
+              </div>
+
+              <BoundingBox color={COLORS.purple} active={true}>
+                <h1 className="text-6xl md:text-8xl lg:text-[120px] font-black tracking-tighter leading-none relative flex items-center">
+                  <span className="text-white">李东霖</span>
+                  <div className="flex items-center ml-2 md:ml-4">
+                    {cursorIndex === 0 && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-purple-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                    {titleChars.map((char, i) => {
+                      const isFilled = cycleTime > (i + 1) * 0.25 && cycleTime < 2.5;
+                      return (
+                        <React.Fragment key={i}>
+                          <span
+                            className="transition-all duration-500 ease-in-out"
+                            style={{
+                              color: isFilled ? '#ffffff' : 'transparent',
+                              WebkitTextStroke: isFilled ? '2px #ffffff' : '2px #71717a'
+                            }}
+                          >
+                            {char}
+                          </span>
+                          {cursorIndex === i + 1 && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-purple-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                </h1>
+              </BoundingBox>
+
+              <div className="mt-4 relative inline-block">
+                 <h2 
+                   className="text-3xl md:text-5xl lg:text-7xl font-bold tracking-tight text-transparent"
+                   style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}
+                 >
+                   2026 Work Performance Report
+                 </h2>
+              </div>
+              
+              <div className="mt-8 text-zinc-600 font-mono text-xs">
+                © 2026
+              </div>
+            </div>
+
+            <PenToolWidget time={time} />
+            <RectangleInputWidget time={time} />
+            <GradientWidget time={time} />
+
+            {/* 向下滑动指示器 - 已下移至 bottom-6 */}
+            <div 
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer z-30 group"
+              onClick={scrollToWorks}
+            >
+              <span className="text-zinc-600 font-mono text-[9px] uppercase tracking-[0.4em] transition-colors group-hover:text-white">
+                EXPLORE WORKS
+              </span>
+              <div className="p-2 rounded-full border border-white/10 group-hover:border-white/30 transition-all group-hover:translate-y-1">
+                <ChevronDown className="text-zinc-500 animate-bounce group-hover:text-white" size={20} />
+              </div>
+            </div>
+          </section>
+
+          {/* --- 第二屏：垂直大图展示 --- */}
+          <section className="relative w-full">
+            <PortfolioWorksSection />
+          </section>
+
+          <footer className="relative z-10 py-12 text-center text-zinc-800 font-mono text-[9px] uppercase tracking-[0.8em]">
+            Design Engineering by Donglin / Portfolio 2026
+          </footer>
+        </div>
+      );
+    }
+
+    // 渲染根节点
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
