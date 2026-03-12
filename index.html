@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>李东霖 - 2026 Work Performance Report</title>
   
   <!-- 引入 Tailwind CSS -->
@@ -16,8 +16,14 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    /* 将全局基础底色改为纯黑 #000 */
-    body, html { margin: 0; padding: 0; background-color: #000; overflow-x: hidden; }
+    /* 将全局基础底色改为纯黑 #000，并优化移动端点击高亮 */
+    body, html { 
+      margin: 0; 
+      padding: 0; 
+      background-color: #000; 
+      overflow-x: hidden; 
+      -webkit-tap-highlight-color: transparent;
+    }
   </style>
 </head>
 <body>
@@ -44,14 +50,10 @@
     const X = ({ size = 24, className = "" }) => (
       <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
     );
-    const Plus = ({ size = 24, className = "" }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-    );
 
     // =========================================================================
     // 🔴 本地图片配置区
     // =========================================================================
-    // 已经为你自动生成了 1-01.jpg 到 1-31.jpg 的 31 张图片路径！
     const PRELOAD_WORKS = [
       { id: 'img01', url: './images/1-01.jpg', name: '作品01' },
       { id: 'img02', url: './images/1-02.jpg', name: '作品02' },
@@ -104,7 +106,7 @@
 
       return (
         <div className={`fixed inset-0 z-[999] flex items-center justify-center bg-black transition-opacity duration-1000 ease-in-out ${stage >= 4 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-          <div className="flex flex-col items-center justify-center relative w-full max-w-lg">
+          <div className="flex flex-col items-center justify-center relative w-full px-4 max-w-lg">
             <div className="overflow-hidden pb-4 w-full flex justify-center">
               <div className={`transition-transform duration-1000 ease-out w-full flex justify-center ${stage >= 2 ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
                 <svg width="100%" height="60" className="overflow-visible">
@@ -113,7 +115,7 @@
                     y="50%"
                     dominantBaseline="central"
                     textAnchor="middle"
-                    className="text-4xl md:text-5xl tracking-[0.15em] font-medium"
+                    className="text-2xl sm:text-4xl md:text-5xl tracking-[0.1em] md:tracking-[0.15em] font-medium"
                     style={{
                       fill: stage >= 2 ? '#ffffff' : 'transparent', 
                       stroke: 'rgba(255, 255, 255, 0.9)',
@@ -128,9 +130,9 @@
                 </svg>
               </div>
             </div>
-            <div className={`h-[1px] bg-white/40 transition-all duration-700 ease-in-out ${stage >= 1 ? 'w-3/4 opacity-100' : 'w-0 opacity-0'}`}></div>
+            <div className={`h-[1px] bg-white/40 transition-all duration-700 ease-in-out ${stage >= 1 ? 'w-full md:w-3/4 opacity-100' : 'w-0 opacity-0'}`}></div>
             <div className="overflow-hidden pt-4">
-              <p className={`text-zinc-500 font-mono text-xs tracking-[0.4em] uppercase transition-transform duration-1000 ease-out ${stage >= 2 ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+              <p className={`text-zinc-500 font-mono text-[10px] md:text-xs tracking-[0.4em] uppercase transition-transform duration-1000 ease-out ${stage >= 2 ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
                 Work Report
               </p>
             </div>
@@ -140,15 +142,14 @@
     };
 
     // --- 基础组件：流体渐变背景 ---
-    // 修改：增加 isFixed 参数，使得它既能全屏固定作为大背景，也能放在相对容器里作为页脚背景
     const FluidBackground = ({ time, isFixed = true }) => {
       return (
         <div className={`${isFixed ? 'fixed' : 'absolute'} inset-0 pointer-events-none overflow-hidden z-0`}>
-          <div className="absolute inset-0 opacity-60 filter blur-[120px]">
-            <div className="absolute top-1/2 left-1/2 w-[70vw] h-[70vh] bg-blue-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.6) * 25}vw, ${Math.cos(time * 0.8) * 20}vh) scale(${1 + Math.sin(time * 1.0) * 0.2})` }} />
-            <div className="absolute top-1/2 left-1/2 w-[60vw] h-[60vh] bg-purple-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 0.8) * -20}vw, ${Math.sin(time * 0.6) * 25}vh) scale(${1 + Math.cos(time * 0.8) * 0.1})` }} />
-            <div className="absolute top-1/2 left-1/2 w-[65vw] h-[65vh] bg-red-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.4) * 30}vw, ${Math.cos(time * 1.0) * -25}vh) scale(${1 + Math.sin(time * 0.3) * 0.15})` }} />
-            <div className="absolute top-1/2 left-1/2 w-[55vw] h-[55vh] bg-orange-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 1.0) * -30}vw, ${Math.sin(time * 0.4) * -20}vh) scale(${1 + Math.cos(time * 0.8) * 0.2})` }} />
+          <div className="absolute inset-0 opacity-60 filter blur-[80px] md:blur-[120px]">
+            <div className="absolute top-1/2 left-1/2 w-[90vw] md:w-[70vw] h-[70vh] bg-blue-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.6) * 25}vw, ${Math.cos(time * 0.8) * 20}vh) scale(${1 + Math.sin(time * 1.0) * 0.2})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[80vw] md:w-[60vw] h-[60vh] bg-purple-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 0.8) * -20}vw, ${Math.sin(time * 0.6) * 25}vh) scale(${1 + Math.cos(time * 0.8) * 0.1})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[85vw] md:w-[65vw] h-[65vh] bg-red-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.4) * 30}vw, ${Math.cos(time * 1.0) * -25}vh) scale(${1 + Math.sin(time * 0.3) * 0.15})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[75vw] md:w-[55vw] h-[55vh] bg-orange-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 1.0) * -30}vw, ${Math.sin(time * 0.4) * -20}vh) scale(${1 + Math.cos(time * 0.8) * 0.2})` }} />
           </div>
         </div>
       );
@@ -158,21 +159,21 @@
     const BoundingBox = ({ children, color, active = false }) => (
       <div className="relative inline-block transition-all duration-500" style={{ boxShadow: active ? `0 0 0 1px ${color}` : 'none' }}>
         {children}
-        <div className={`absolute -top-1 -left-1 w-2 h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
-        <div className={`absolute -top-1 -right-1 w-2 h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
-        <div className={`absolute -bottom-1 -left-1 w-2 h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
-        <div className={`absolute -bottom-1 -right-1 w-2 h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
+        <div className={`absolute -top-1 -left-1 w-1.5 h-1.5 md:w-2 md:h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
+        <div className={`absolute -top-1 -right-1 w-1.5 h-1.5 md:w-2 md:h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
+        <div className={`absolute -bottom-1 -left-1 w-1.5 h-1.5 md:w-2 md:h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
+        <div className={`absolute -bottom-1 -right-1 w-1.5 h-1.5 md:w-2 md:h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
       </div>
     );
 
-    // --- 微件1：钢笔工具 ---
+    // --- 微件们：聚拢修改 (向中心靠拢，统一使用 origin-center 和 scale-70) ---
     const PenToolWidget = ({ time, visible }) => {
       const offset = Math.sin(time * 2); 
       const cx = 80 + offset * 40; 
       const cy = 30 + Math.cos(time * 2) * 20; 
 
       return (
-        <div className={`absolute top-[20%] left-[10%] z-10 w-[160px] transition-all duration-1000 delay-[500ms] ease-out ${visible ? 'translate-y-0 opacity-100' : '-translate-y-12 opacity-0'}`}>
+        <div className={`absolute top-[25%] md:top-[20%] left-[8%] md:left-[10%] z-10 w-[160px] scale-[0.7] md:scale-100 origin-center transition-all duration-1000 delay-[500ms] ease-out ${visible ? 'translate-y-0 opacity-100' : '-translate-y-12 opacity-0'}`}>
           <div className="text-white font-mono text-[10px] mb-2">Pen Tool</div>
           <div className="relative w-full h-[100px]">
             <svg width="160" height="100" className="overflow-visible absolute top-0 left-0 z-0">
@@ -190,14 +191,13 @@
       );
     };
 
-    // --- 微件2：矩形数值输入 ---
     const RectangleInputWidget = ({ time, visible }) => {
       const cycle = time % 4; 
       let text = cycle < 0.5 ? "19" : cycle < 0.8 ? "192" : cycle < 2.0 ? "1920" : cycle < 2.3 ? "192" : cycle < 2.5 ? "19" : cycle < 2.7 ? "1" : "";
       const isBlinking = (time * 2) % 1 > 0.5;
 
       return (
-        <div className={`absolute bottom-[20%] left-[15%] z-20 font-mono text-xs transition-all duration-1000 delay-[700ms] ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+        <div className={`absolute bottom-[28%] md:bottom-[20%] left-[5%] md:left-[15%] z-20 font-mono text-xs scale-[0.7] md:scale-100 origin-center transition-all duration-1000 delay-[700ms] ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
           <div className="bg-white/[0.08] backdrop-blur-[2px] border border-white/20 rounded-md p-3 w-40 shadow-lg">
             <div className="flex justify-between items-center text-white mb-3 text-[10px]"><span>Rectangle 1</span></div>
             <div className="flex gap-2 mb-2">
@@ -218,14 +218,13 @@
       );
     };
 
-    // --- 微件3：渐变滑块调整 ---
     const GradientWidget = ({ time, visible }) => {
       const progress = (Math.sin(time * 1.5) + 1) / 2; 
       const trackWidth = 152; 
       const thumbX = progress * (trackWidth - 16); 
       
       return (
-        <div className={`absolute bottom-[20%] right-[15%] z-20 font-mono text-xs transition-all duration-1000 delay-[1000ms] ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+        <div className={`absolute bottom-[26%] md:bottom-[20%] right-[4%] md:right-[15%] z-20 font-mono text-xs scale-[0.7] md:scale-100 origin-center transition-all duration-1000 delay-[1000ms] ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
           <div className="bg-white/[0.08] backdrop-blur-[2px] border border-white/20 p-3 rounded-md w-44 shadow-lg">
             <div className="text-[10px] text-white mb-3 flex justify-between"><span>Fill</span><span>Linear</span></div>
             <div className="h-6 w-full rounded-sm mb-4 border border-white/15 shadow-inner opacity-90" style={{ background: `linear-gradient(to right, #EF4444 ${progress * 100}%, #06B6D4)` }} />
@@ -241,18 +240,29 @@
       );
     };
 
-    // --- 核心更新：纯静态渲染的作品集展示板块 ---
+    // --- 作品集展示板块 ---
     const PortfolioWorksSection = () => {
       const works = PRELOAD_WORKS;
       const [activeImageIndex, setActiveImageIndex] = useState(null);
       const containerRefs = useRef([]);
+      
+      // 滑动拖拽记录状态
+      const [dragOffset, setDragOffset] = useState(0);
+      const [isDragging, setIsDragging] = useState(false);
+      const [transitionEnabled, setTransitionEnabled] = useState(false);
+
+      const touchStartRef = useRef(0);
+      const isSwipingRef = useRef(false);
+      const dragTimerRef = useRef(null);
 
       containerRefs.current = [];
 
-      // 全新外部弹性视差逻辑：不操作图片内部，只操作整个容器
+      // 计算首尾相连的相邻图片序号
+      const prevIndex = activeImageIndex !== null ? (activeImageIndex - 1 + works.length) % works.length : null;
+      const nextIndex = activeImageIndex !== null ? (activeImageIndex + 1) % works.length : null;
+
       useEffect(() => {
         let reqId;
-
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -273,7 +283,6 @@
               if (el) {
                 const rect = el.getBoundingClientRect();
                 const viewHeight = window.innerHeight;
-                
                 if (rect.top <= viewHeight && rect.bottom >= 0) {
                   const offset = (viewHeight / 2 - rect.top) * 0.05; 
                   el.style.transform = `translateY(${offset}px)`;
@@ -293,7 +302,6 @@
         };
       }, [works]);
 
-      // Lightbox 键盘控制
       useEffect(() => {
         const handleKeyDown = (e) => {
           if (activeImageIndex === null) return;
@@ -305,17 +313,13 @@
         return () => window.removeEventListener('keydown', handleKeyDown);
       }, [activeImageIndex, works.length]);
 
-      // --- 新增：放大查看时的全局防滚动锁 ---
       useEffect(() => {
         if (activeImageIndex !== null) {
-          // 锁定 CSS 滚动
           document.body.style.overflow = 'hidden';
           document.documentElement.style.overflow = 'hidden';
 
-          // 物理拦截滚动事件
           const preventScroll = (e) => e.preventDefault();
           const preventKeyScroll = (e) => {
-            // 屏蔽上下翻页键，但不屏蔽左右键(用于切换图片)和 Esc 键(用于关闭)
             if (['Space', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.code)) {
               e.preventDefault();
             }
@@ -325,7 +329,6 @@
           window.addEventListener('touchmove', preventScroll, { passive: false });
           window.addEventListener('keydown', preventKeyScroll, { passive: false });
 
-          // 弹窗关闭时，解除所有封印
           return () => {
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
@@ -336,16 +339,73 @@
         }
       }, [activeImageIndex]);
 
+      // --- 全新的真实物理拖拽处理 ---
+      const handleTouchStart = (e) => {
+        // 若正在动画过渡中，则不接收新拖拽
+        if (dragTimerRef.current) return;
+        touchStartRef.current = e.targetTouches[0].clientX;
+        setIsDragging(true);
+        setTransitionEnabled(false); // 拖拽时完全跟随手指，无延迟
+        isSwipingRef.current = false;
+      };
+
+      const handleTouchMove = (e) => {
+        if (!isDragging) return;
+        setDragOffset(e.targetTouches[0].clientX - touchStartRef.current);
+      };
+
+      const handleTouchEnd = () => {
+        if (!isDragging) return;
+        setIsDragging(false);
+        setTransitionEnabled(true); // 松手后恢复过渡动画
+
+        const minSwipeDistance = 60; // 判定为切图的最小滑动距离
+
+        if (dragOffset > minSwipeDistance) {
+          // 向右滑 -> 上一张
+          isSwipingRef.current = true;
+          setDragOffset(window.innerWidth); // 动画弹向屏幕右侧
+          dragTimerRef.current = setTimeout(() => {
+            setTransitionEnabled(false); // 瞬间重置位置，关闭动画
+            setActiveImageIndex(prevIndex);
+            setDragOffset(0);
+            dragTimerRef.current = null;
+            setTimeout(() => { isSwipingRef.current = false; }, 50);
+          }, 300); // 300ms对应css过渡时间
+        } else if (dragOffset < -minSwipeDistance) {
+          // 向左滑 -> 下一张
+          isSwipingRef.current = true;
+          setDragOffset(-window.innerWidth); // 动画弹向屏幕左侧
+          dragTimerRef.current = setTimeout(() => {
+            setTransitionEnabled(false);
+            setActiveImageIndex(nextIndex);
+            setDragOffset(0);
+            dragTimerRef.current = null;
+            setTimeout(() => { isSwipingRef.current = false; }, 50);
+          }, 300);
+        } else {
+          // 滑动距离太短 -> 像橡皮筋一样回弹到原位
+          if (Math.abs(dragOffset) > 10) isSwipingRef.current = true;
+          setDragOffset(0);
+          setTimeout(() => { isSwipingRef.current = false; }, 300);
+        }
+      };
+
+      const handleCloseLightbox = () => {
+        if (isSwipingRef.current) return; // 如果刚刚有拖拽动作，则拦截点击关闭
+        setActiveImageIndex(null);
+      };
+
       return (
         <div className="relative z-10 w-full pt-4 pb-16 min-h-screen">
-          <div className="px-6 md:px-[12.5%] flex justify-between items-end mb-12 border-b border-white/10 pb-4">
+          <div className="px-4 md:px-[12.5%] flex justify-between items-end mb-8 md:mb-12 border-b border-white/10 pb-4">
             <div>
-              <h2 className="text-white text-3xl font-black tracking-tighter mb-2">SELECTED WORKS</h2>
-              <p className="text-zinc-500 font-mono text-xs uppercase tracking-[0.3em]">Exhibition / Portfolio / 2026</p>
+              <h2 className="text-white text-2xl md:text-3xl font-black tracking-tighter mb-2">SELECTED WORKS</h2>
+              <p className="text-zinc-500 font-mono text-[10px] md:text-xs uppercase tracking-[0.3em]">Exhibition / Portfolio / 2026</p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-16 md:gap-24 w-full">
+          <div className="flex flex-col gap-8 md:gap-24 w-full">
             {works.map((work, index) => (
               <div 
                 key={work.id} 
@@ -366,24 +426,81 @@
             ))}
           </div>
 
-          {/* --- 全屏放大查看器 --- */}
+          {/* --- 全屏放大查看器 (支持真实手势滑动) --- */}
           {activeImageIndex !== null && works.length > 0 && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl transition-all duration-500" onClick={() => setActiveImageIndex(null)}>
-              <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors" onClick={() => setActiveImageIndex(null)}>
-                <X size={36} />
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl transition-all duration-500 overflow-hidden">
+              
+              {/* 超大型触摸层容器，负责捕捉手指滑动，同时控制内层元素位移 */}
+              <div 
+                className="absolute inset-0 flex items-center justify-center touch-none"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onClick={handleCloseLightbox}
+              >
+                
+                {/* 左侧：上一张图片 (始终在屏幕左边待命) */}
+                {works.length > 1 && (
+                  <div 
+                    className="absolute w-full h-full flex items-center justify-center will-change-transform"
+                    style={{ 
+                      transform: `translateX(calc(-100vw + ${dragOffset}px))`, 
+                      transition: transitionEnabled ? 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)' : 'none' 
+                    }}
+                  >
+                    <img src={works[prevIndex].url} className="max-w-[100vw] md:max-w-[90vw] max-h-[90vh] object-contain drop-shadow-2xl" />
+                  </div>
+                )}
+
+                {/* 居中：当前图片 */}
+                <div 
+                  className="absolute w-full h-full flex items-center justify-center will-change-transform"
+                  style={{ 
+                    transform: `translateX(${dragOffset}px)`, 
+                    transition: transitionEnabled ? 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)' : 'none' 
+                  }}
+                >
+                  <img 
+                    src={works[activeImageIndex].url} 
+                    className="max-w-[100vw] md:max-w-[90vw] max-h-[90vh] object-contain drop-shadow-2xl pointer-events-none md:pointer-events-auto" 
+                    onClick={(e) => {
+                      if(window.innerWidth >= 768) e.stopPropagation();
+                    }} 
+                  />
+                </div>
+
+                {/* 右侧：下一张图片 (始终在屏幕右边待命) */}
+                {works.length > 1 && (
+                  <div 
+                    className="absolute w-full h-full flex items-center justify-center will-change-transform"
+                    style={{ 
+                      transform: `translateX(calc(100vw + ${dragOffset}px))`, 
+                      transition: transitionEnabled ? 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)' : 'none' 
+                    }}
+                  >
+                    <img src={works[nextIndex].url} className="max-w-[100vw] md:max-w-[90vw] max-h-[90vh] object-contain drop-shadow-2xl" />
+                  </div>
+                )}
+              </div>
+
+              {/* 独立于滑动层的 UI 控制组件，绝对固定 */}
+              <button className="absolute top-4 right-4 md:top-8 md:right-8 text-white/50 hover:text-white transition-colors p-2 z-[110]" onClick={handleCloseLightbox}>
+                <X size={32} className="md:w-9 md:h-9" />
               </button>
+              
               {works.length > 1 && (
-                <button className="absolute left-8 text-white/30 hover:text-white transition-colors p-4" onClick={(e) => { e.stopPropagation(); setActiveImageIndex((activeImageIndex - 1 + works.length) % works.length); }}>
-                  <ChevronLeft size={48} />
+                <button className="hidden md:block absolute left-8 text-white/30 hover:text-white transition-colors p-4 z-[110]" onClick={(e) => { e.stopPropagation(); setActiveImageIndex(prevIndex); }}>
+                  <ChevronLeft size={36} className="md:w-12 md:h-12" />
                 </button>
               )}
-              <img src={works[activeImageIndex].url} alt={works[activeImageIndex].name} className="max-w-[90vw] max-h-[90vh] object-contain drop-shadow-2xl cursor-default" onClick={(e) => e.stopPropagation()} />
+              
               {works.length > 1 && (
-                <button className="absolute right-8 text-white/30 hover:text-white transition-colors p-4" onClick={(e) => { e.stopPropagation(); setActiveImageIndex((activeImageIndex + 1) % works.length); }}>
-                  <ChevronRight size={48} />
+                <button className="hidden md:block absolute right-8 text-white/30 hover:text-white transition-colors p-4 z-[110]" onClick={(e) => { e.stopPropagation(); setActiveImageIndex(nextIndex); }}>
+                  <ChevronRight size={36} className="md:w-12 md:h-12" />
                 </button>
               )}
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/50 font-mono text-xs tracking-[0.3em]">
+              
+              <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 text-white/50 font-mono text-[10px] md:text-xs tracking-[0.3em] z-[110] pointer-events-none">
                 {activeImageIndex + 1} / {works.length}
               </div>
             </div>
@@ -398,7 +515,6 @@
       const [introDone, setIntroDone] = useState(false);
       const typingStartTime = useRef(null);
 
-      // 骨灰级防滚动锁：彻底禁止开屏期间的任何滚动行为
       useEffect(() => {
         if (!introDone) {
           document.body.style.overflow = 'hidden';
@@ -495,28 +611,27 @@
           
           {!introDone && <SplashIntro onComplete={() => setIntroDone(true)} />}
 
-          {/* 首屏的流体背景 */}
           <FluidBackground time={time} />
 
           {/* --- 第一屏：Hero 动画 --- */}
           <section className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
             
-            <div className="absolute top-6 left-8 flex items-center gap-3 z-20">
-              <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
-                <div className="w-2.5 h-2.5 rounded-full bg-black"></div>
+            <div className="absolute top-4 left-4 md:top-6 md:left-8 flex items-center gap-2 md:gap-3 z-20">
+              <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-white flex items-center justify-center">
+                <div className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-black"></div>
               </div>
-              <span className="text-white font-bold tracking-tight text-lg">Donglin.</span>
+              <span className="text-white font-bold tracking-tight text-base md:text-lg">Donglin.</span>
             </div>
 
-            <div className="relative z-10 pointer-events-none text-center">
-              <div className={`text-white font-mono text-xs md:text-sm tracking-[0.2em] mb-4 uppercase transition-opacity duration-1000 ${introDone && typingTime > fullTypingDoneTime ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="relative z-10 pointer-events-none text-center px-2">
+              <div className={`text-white font-mono text-[10px] md:text-xs lg:text-sm tracking-[0.2em] mb-3 md:mb-4 uppercase transition-opacity duration-1000 ${introDone && typingTime > fullTypingDoneTime ? 'opacity-100' : 'opacity-0'}`}>
                 lidonglin the design work
               </div>
 
               <BoundingBox color={COLORS.red} active={showBoundingBox}>
-                <h1 className="text-6xl md:text-8xl lg:text-[120px] font-black tracking-tighter leading-none relative flex items-center">
+                <h1 className="text-[8.5vw] md:text-8xl lg:text-[120px] font-black tracking-tighter leading-none relative flex items-center justify-center whitespace-nowrap">
                   
-                  {globalCursorIndex === 0 && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                  {globalCursorIndex === 0 && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
                   
                   {['李', '东', '霖'].map((char, i) => {
                     const isVisible = isNameCharVisible(i);
@@ -527,20 +642,20 @@
                           className={isVisible ? 'opacity-100' : 'opacity-0'}
                           style={{
                             color: isFilled ? '#ffffff' : 'transparent',
-                            WebkitTextStroke: isFilled ? '2px #ffffff' : '2px #71717a',
+                            WebkitTextStroke: isFilled ? (window.innerWidth < 768 ? '1px #ffffff' : '2px #ffffff') : (window.innerWidth < 768 ? '1px #71717a' : '2px #71717a'),
                             transition: 'color 500ms ease-in-out, -webkit-text-stroke 500ms ease-in-out'
                           }}
                         >
                           {char}
                         </span>
-                        {globalCursorIndex === i + 1 && i < 2 && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                        {globalCursorIndex === i + 1 && i < 2 && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
                       </React.Fragment>
                     );
                   })}
 
-                  <div className="w-2 md:w-4" />
+                  <div className="w-1.5 md:w-4" />
 
-                  {globalCursorIndex === 3 && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                  {globalCursorIndex === 3 && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
                   
                   {['述', '职', '报', '告'].map((char, i) => {
                     const isVisible = isTitleCharVisible(i);
@@ -551,13 +666,13 @@
                           className={isVisible ? 'opacity-100' : 'opacity-0'}
                           style={{
                             color: isFilled ? '#ffffff' : 'transparent',
-                            WebkitTextStroke: isFilled ? '2px #ffffff' : '2px #71717a',
+                            WebkitTextStroke: isFilled ? (window.innerWidth < 768 ? '1px #ffffff' : '2px #ffffff') : (window.innerWidth < 768 ? '1px #71717a' : '2px #71717a'),
                             transition: 'color 500ms ease-in-out, -webkit-text-stroke 500ms ease-in-out'
                           }}
                         >
                           {char}
                         </span>
-                        {globalCursorIndex === 4 + i && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                        {globalCursorIndex === 4 + i && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
                       </React.Fragment>
                     );
                   })}
@@ -565,13 +680,13 @@
                 </h1>
               </BoundingBox>
 
-              <div className={`mt-4 relative inline-block transition-all duration-1000 delay-[1200ms] ease-out ${introDone ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-                 <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold tracking-tight text-transparent" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}>
+              <div className={`mt-3 md:mt-4 relative inline-block transition-all duration-1000 delay-[1200ms] ease-out ${introDone ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+                 <h2 className="text-[4.5vw] md:text-5xl lg:text-7xl font-bold tracking-tight text-transparent whitespace-nowrap" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}>
                    2026 Work Performance Report
                  </h2>
               </div>
               
-              <div className={`mt-8 text-white font-mono text-xs transition-opacity duration-1000 ${introDone && typingTime > fullTypingDoneTime ? 'opacity-100' : 'opacity-0'}`}>
+              <div className={`mt-6 md:mt-8 text-white font-mono text-[10px] md:text-xs transition-opacity duration-1000 ${introDone && typingTime > fullTypingDoneTime ? 'opacity-100' : 'opacity-0'}`}>
                 © 2026
               </div>
             </div>
@@ -586,23 +701,17 @@
             >
               <span className="text-white font-mono text-[9px] uppercase tracking-[0.4em] transition-colors group-hover:text-white">向下滑动查看</span>
               <div className="p-2 rounded-full border border-white/10 group-hover:border-white/30 transition-all group-hover:translate-y-1">
-                <ChevronDown className="text-white animate-bounce group-hover:text-white" size={20} />
+                <ChevronDown className="text-white animate-bounce group-hover:text-white" size={16} />
               </div>
             </div>
           </section>
 
           {/* --- 第二屏及底部 --- */}
           <div className="relative z-10">
-            {/* 顶部的遮罩背景，让光晕平滑过渡成纯黑 */}
             <div className="absolute top-0 left-0 w-full h-[350px] bg-gradient-to-b from-transparent via-black/70 to-black pointer-events-none z-0"></div>
             <div className="absolute top-[350px] left-0 w-full h-[calc(100%-350px)] bg-black pointer-events-none z-0"></div>
             
-            {/* --- 新增：底部溢出流体 --- 
-                放置在图片 section 之前，z-index 为 0，确保被图片遮挡但能从两边透出。
-                h-[800px] 的高度刚好覆盖页脚，并向上延伸到最后一张图片的一半位置。
-            */}
             <div className="absolute bottom-0 left-0 w-full h-[800px] pointer-events-none z-0 overflow-hidden">
-              {/* 顶部超长羽化遮罩：黑变透明，让溢出的光晕平滑消散，完美过渡 */}
               <div className="absolute top-0 left-0 w-full h-[60%] bg-gradient-to-b from-black via-black/80 to-transparent z-10"></div>
               <FluidBackground time={time} isFixed={false} />
             </div>
@@ -612,15 +721,14 @@
             </section>
 
             {/* --- 底部页脚区 --- */}
-            {/* 彻底移除背景黑和 overflow-hidden，让底下溢出的星云流体透出来 */}
             <footer className="relative z-10 w-full flex flex-col">
-              <div className="relative z-20 w-full pt-16 pb-32 flex flex-col">
-                <div className="px-6 md:px-[12.5%] flex justify-between items-center text-white/60 font-mono text-[10px] uppercase tracking-[0.4em] pt-12 mb-32 drop-shadow-md">
+              <div className="relative z-20 w-full pt-8 pb-16 md:pt-16 md:pb-32 flex flex-col">
+                <div className="px-4 md:px-[12.5%] flex justify-between items-center text-white/60 font-mono text-[10px] uppercase tracking-[0.4em] pt-8 md:pt-12 mb-16 md:mb-32 drop-shadow-md">
                   <span>///</span>
                   <span>Portfolio 2026 Production</span>
                 </div>
 
-                <div className="text-center text-white/80 font-mono text-[8px] md:text-[10px] uppercase tracking-[0.3em] drop-shadow-md">
+                <div className="text-center text-white/80 font-mono text-[8px] md:text-[10px] uppercase tracking-[0.3em] drop-shadow-md px-2">
                   Design Engineering by Donglin / Portfolio 2026
                 </div>
               </div>
