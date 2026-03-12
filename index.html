@@ -32,7 +32,7 @@
 
   <!-- React 业务逻辑代码 -->
   <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
+    const { useState, useEffect, useRef, memo } = React;
 
     // --- 重写图标组件 ---
     const MousePointer2 = ({ size = 24, color = "currentColor", fill = "none", className = "" }) => (
@@ -142,18 +142,19 @@
     };
 
     // --- 基础组件：流体渐变背景 ---
-    const FluidBackground = ({ time, isFixed = true }) => {
+    // 性能优化：移动端使用 translate3d 开启硬件加速，降低无谓重绘
+    const FluidBackground = memo(({ time, isFixed = true }) => {
       return (
         <div className={`${isFixed ? 'fixed' : 'absolute'} inset-0 pointer-events-none overflow-hidden z-0`}>
           <div className="absolute inset-0 opacity-60 filter blur-[80px] md:blur-[120px]">
-            <div className="absolute top-1/2 left-1/2 w-[90vw] md:w-[70vw] h-[70vh] bg-blue-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.6) * 25}vw, ${Math.cos(time * 0.8) * 20}vh) scale(${1 + Math.sin(time * 1.0) * 0.2})` }} />
-            <div className="absolute top-1/2 left-1/2 w-[80vw] md:w-[60vw] h-[60vh] bg-purple-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 0.8) * -20}vw, ${Math.sin(time * 0.6) * 25}vh) scale(${1 + Math.cos(time * 0.8) * 0.1})` }} />
-            <div className="absolute top-1/2 left-1/2 w-[85vw] md:w-[65vw] h-[65vh] bg-red-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.4) * 30}vw, ${Math.cos(time * 1.0) * -25}vh) scale(${1 + Math.sin(time * 0.3) * 0.15})` }} />
-            <div className="absolute top-1/2 left-1/2 w-[75vw] md:w-[55vw] h-[55vh] bg-orange-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 1.0) * -30}vw, ${Math.sin(time * 0.4) * -20}vh) scale(${1 + Math.cos(time * 0.8) * 0.2})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[90vw] md:w-[70vw] h-[70vh] bg-blue-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate3d(${Math.sin(time * 0.6) * 25}vw, ${Math.cos(time * 0.8) * 20}vh, 0) scale(${1 + Math.sin(time * 1.0) * 0.2})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[80vw] md:w-[60vw] h-[60vh] bg-purple-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate3d(${Math.cos(time * 0.8) * -20}vw, ${Math.sin(time * 0.6) * 25}vh, 0) scale(${1 + Math.cos(time * 0.8) * 0.1})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[85vw] md:w-[65vw] h-[65vh] bg-red-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate3d(${Math.sin(time * 0.4) * 30}vw, ${Math.cos(time * 1.0) * -25}vh, 0) scale(${1 + Math.sin(time * 0.3) * 0.15})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[75vw] md:w-[55vw] h-[55vh] bg-orange-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate3d(${Math.cos(time * 1.0) * -30}vw, ${Math.sin(time * 0.4) * -20}vh, 0) scale(${1 + Math.cos(time * 0.8) * 0.2})` }} />
           </div>
         </div>
       );
-    };
+    });
 
     // --- 基础组件：Figma风格选中框 ---
     const BoundingBox = ({ children, color, active = false }) => (
@@ -166,8 +167,8 @@
       </div>
     );
 
-    // --- 微件们：聚拢修改 (向中心靠拢，统一使用 origin-center 和 scale-70) ---
-    const PenToolWidget = ({ time, visible }) => {
+    // --- 微件们 ---
+    const PenToolWidget = memo(({ time, visible }) => {
       const offset = Math.sin(time * 2); 
       const cx = 80 + offset * 40; 
       const cy = 30 + Math.cos(time * 2) * 20; 
@@ -189,9 +190,9 @@
           </div>
         </div>
       );
-    };
+    });
 
-    const RectangleInputWidget = ({ time, visible }) => {
+    const RectangleInputWidget = memo(({ time, visible }) => {
       const cycle = time % 4; 
       let text = cycle < 0.5 ? "19" : cycle < 0.8 ? "192" : cycle < 2.0 ? "1920" : cycle < 2.3 ? "192" : cycle < 2.5 ? "19" : cycle < 2.7 ? "1" : "";
       const isBlinking = (time * 2) % 1 > 0.5;
@@ -216,9 +217,9 @@
           </div>
         </div>
       );
-    };
+    });
 
-    const GradientWidget = ({ time, visible }) => {
+    const GradientWidget = memo(({ time, visible }) => {
       const progress = (Math.sin(time * 1.5) + 1) / 2; 
       const trackWidth = 152; 
       const thumbX = progress * (trackWidth - 16); 
@@ -238,15 +239,14 @@
           </div>
         </div>
       );
-    };
+    });
 
-    // --- 作品集展示板块 ---
-    const PortfolioWorksSection = () => {
+    // 🚀 核心性能优化：使用 React.memo 隔离 31 张图片的渲染树，避免被顶部动画的 60fps 牵连刷新！
+    const PortfolioWorksSection = memo(() => {
       const works = PRELOAD_WORKS;
       const [activeImageIndex, setActiveImageIndex] = useState(null);
       const containerRefs = useRef([]);
       
-      // 滑动拖拽记录状态
       const [dragOffset, setDragOffset] = useState(0);
       const [isDragging, setIsDragging] = useState(false);
       const [transitionEnabled, setTransitionEnabled] = useState(false);
@@ -257,7 +257,6 @@
 
       containerRefs.current = [];
 
-      // 计算首尾相连的相邻图片序号
       const prevIndex = activeImageIndex !== null ? (activeImageIndex - 1 + works.length) % works.length : null;
       const nextIndex = activeImageIndex !== null ? (activeImageIndex + 1) % works.length : null;
 
@@ -284,8 +283,9 @@
                 const rect = el.getBoundingClientRect();
                 const viewHeight = window.innerHeight;
                 if (rect.top <= viewHeight && rect.bottom >= 0) {
+                  // 使用 translate3d 开启硬件加速
                   const offset = (viewHeight / 2 - rect.top) * 0.05; 
-                  el.style.transform = `translateY(${offset}px)`;
+                  el.style.transform = `translate3d(0, ${offset}px, 0)`;
                 }
               }
             });
@@ -339,13 +339,11 @@
         }
       }, [activeImageIndex]);
 
-      // --- 全新的真实物理拖拽处理 ---
       const handleTouchStart = (e) => {
-        // 若正在动画过渡中，则不接收新拖拽
         if (dragTimerRef.current) return;
         touchStartRef.current = e.targetTouches[0].clientX;
         setIsDragging(true);
-        setTransitionEnabled(false); // 拖拽时完全跟随手指，无延迟
+        setTransitionEnabled(false); 
         isSwipingRef.current = false;
       };
 
@@ -357,25 +355,23 @@
       const handleTouchEnd = () => {
         if (!isDragging) return;
         setIsDragging(false);
-        setTransitionEnabled(true); // 松手后恢复过渡动画
+        setTransitionEnabled(true); 
 
-        const minSwipeDistance = 60; // 判定为切图的最小滑动距离
+        const minSwipeDistance = 60; 
 
         if (dragOffset > minSwipeDistance) {
-          // 向右滑 -> 上一张
           isSwipingRef.current = true;
-          setDragOffset(window.innerWidth); // 动画弹向屏幕右侧
+          setDragOffset(window.innerWidth); 
           dragTimerRef.current = setTimeout(() => {
-            setTransitionEnabled(false); // 瞬间重置位置，关闭动画
+            setTransitionEnabled(false); 
             setActiveImageIndex(prevIndex);
             setDragOffset(0);
             dragTimerRef.current = null;
             setTimeout(() => { isSwipingRef.current = false; }, 50);
-          }, 300); // 300ms对应css过渡时间
+          }, 300); 
         } else if (dragOffset < -minSwipeDistance) {
-          // 向左滑 -> 下一张
           isSwipingRef.current = true;
-          setDragOffset(-window.innerWidth); // 动画弹向屏幕左侧
+          setDragOffset(-window.innerWidth); 
           dragTimerRef.current = setTimeout(() => {
             setTransitionEnabled(false);
             setActiveImageIndex(nextIndex);
@@ -384,7 +380,6 @@
             setTimeout(() => { isSwipingRef.current = false; }, 50);
           }, 300);
         } else {
-          // 滑动距离太短 -> 像橡皮筋一样回弹到原位
           if (Math.abs(dragOffset) > 10) isSwipingRef.current = true;
           setDragOffset(0);
           setTimeout(() => { isSwipingRef.current = false; }, 300);
@@ -392,7 +387,7 @@
       };
 
       const handleCloseLightbox = () => {
-        if (isSwipingRef.current) return; // 如果刚刚有拖拽动作，则拦截点击关闭
+        if (isSwipingRef.current) return; 
         setActiveImageIndex(null);
       };
 
@@ -410,7 +405,8 @@
               <div 
                 key={work.id} 
                 ref={el => { if(el) containerRefs.current[index] = el; }}
-                className="relative w-full aspect-video opacity-0 scale-95 transition-all duration-1000 ease-out will-change-transform"
+                // 性能优化：去除了手机端的 will-change-transform，防止占用大量显存导致崩溃卡顿
+                className="relative w-full aspect-video opacity-0 scale-95 transition-all duration-1000 ease-out"
               >
                 <div 
                   className="w-full h-full cursor-pointer group overflow-hidden"
@@ -420,17 +416,16 @@
                     src={work.url} 
                     alt={work.name} 
                     className="w-full h-full object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-[1.015]" 
+                    loading="lazy" // 性能优化：给非首屏图片添加原生懒加载
                   />
                 </div>
               </div>
             ))}
           </div>
 
-          {/* --- 全屏放大查看器 (支持真实手势滑动) --- */}
+          {/* --- 全屏放大查看器 --- */}
           {activeImageIndex !== null && works.length > 0 && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl transition-all duration-500 overflow-hidden">
-              
-              {/* 超大型触摸层容器，负责捕捉手指滑动，同时控制内层元素位移 */}
               <div 
                 className="absolute inset-0 flex items-center justify-center touch-none"
                 onTouchStart={handleTouchStart}
@@ -438,13 +433,11 @@
                 onTouchEnd={handleTouchEnd}
                 onClick={handleCloseLightbox}
               >
-                
-                {/* 左侧：上一张图片 (始终在屏幕左边待命) */}
                 {works.length > 1 && (
                   <div 
-                    className="absolute w-full h-full flex items-center justify-center will-change-transform"
+                    className="absolute w-full h-full flex items-center justify-center"
                     style={{ 
-                      transform: `translateX(calc(-100vw + ${dragOffset}px))`, 
+                      transform: `translate3d(calc(-100vw + ${dragOffset}px), 0, 0)`, 
                       transition: transitionEnabled ? 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)' : 'none' 
                     }}
                   >
@@ -452,11 +445,10 @@
                   </div>
                 )}
 
-                {/* 居中：当前图片 */}
                 <div 
-                  className="absolute w-full h-full flex items-center justify-center will-change-transform"
+                  className="absolute w-full h-full flex items-center justify-center"
                   style={{ 
-                    transform: `translateX(${dragOffset}px)`, 
+                    transform: `translate3d(${dragOffset}px, 0, 0)`, 
                     transition: transitionEnabled ? 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)' : 'none' 
                   }}
                 >
@@ -469,12 +461,11 @@
                   />
                 </div>
 
-                {/* 右侧：下一张图片 (始终在屏幕右边待命) */}
                 {works.length > 1 && (
                   <div 
-                    className="absolute w-full h-full flex items-center justify-center will-change-transform"
+                    className="absolute w-full h-full flex items-center justify-center"
                     style={{ 
-                      transform: `translateX(calc(100vw + ${dragOffset}px))`, 
+                      transform: `translate3d(calc(100vw + ${dragOffset}px), 0, 0)`, 
                       transition: transitionEnabled ? 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)' : 'none' 
                     }}
                   >
@@ -483,7 +474,6 @@
                 )}
               </div>
 
-              {/* 独立于滑动层的 UI 控制组件，绝对固定 */}
               <button className="absolute top-4 right-4 md:top-8 md:right-8 text-white/50 hover:text-white transition-colors p-2 z-[110]" onClick={handleCloseLightbox}>
                 <X size={32} className="md:w-9 md:h-9" />
               </button>
@@ -507,7 +497,7 @@
           )}
         </div>
       );
-    };
+    });
 
     // --- 主应用 ---
     function App() {
@@ -623,13 +613,11 @@
               <span className="text-white font-bold tracking-tight text-base md:text-lg">Donglin.</span>
             </div>
 
-            {/* 新增：加入了 w-full 确保父容器占满宽度 */}
             <div className="relative z-10 pointer-events-none text-center px-2 w-full">
               <div className={`text-white font-mono text-[10px] md:text-xs lg:text-sm tracking-[0.2em] mb-3 md:mb-4 uppercase transition-opacity duration-1000 ${introDone && typingTime > fullTypingDoneTime ? 'opacity-100' : 'opacity-0'}`}>
                 lidonglin the design work
               </div>
 
-              {/* 新增：外层加入 w-full flex justify-center，强制占满整行并居中，防止和下方文字挤到一起 */}
               <div className="w-full flex justify-center">
                 <BoundingBox color={COLORS.red} active={showBoundingBox}>
                   <h1 className="text-[8.5vw] md:text-8xl lg:text-[120px] font-black tracking-tighter leading-none relative flex items-center justify-center whitespace-nowrap">
@@ -684,7 +672,6 @@
                 </BoundingBox>
               </div>
 
-              {/* 修改：将 inline-block 改为了 w-full flex justify-center */}
               <div className={`mt-3 md:mt-4 relative w-full flex justify-center transition-all duration-1000 delay-[1200ms] ease-out ${introDone ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
                  <h2 className="text-[4.5vw] md:text-5xl lg:text-7xl font-bold tracking-tight text-transparent whitespace-nowrap" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}>
                    2026 Work Performance Report
