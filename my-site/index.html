@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>李东霖 - 2026 Work Performance Report</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 React 和 ReactDOM (UMD版本) -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  
+  <!-- 引入 Babel 用于在浏览器中实时编译 JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* 将全局基础底色改为纯黑 #000 */
+    body, html { margin: 0; padding: 0; background-color: #000; overflow-x: hidden; }
+  </style>
+</head>
+<body>
+  <!-- React 应用挂载点 -->
+  <div id="root"></div>
+
+  <!-- React 业务逻辑代码 -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- 重写图标组件 ---
+    const MousePointer2 = ({ size = 24, color = "currentColor", fill = "none", className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m4 4 7.07 17 2.51-7.39L21 11.07z"/></svg>
+    );
+    const ChevronDown = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>
+    );
+    const ChevronLeft = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>
+    );
+    const ChevronRight = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>
+    );
+    const X = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    );
+    const Plus = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    );
+
+    // =========================================================================
+    // 🔴 本地图片配置区
+    // =========================================================================
+    // 已经为你自动生成了 1-01.jpg 到 1-31.jpg 的 31 张图片路径！
+    const PRELOAD_WORKS = [
+      { id: 'img01', url: './images/1-01.jpg', name: '作品01' },
+      { id: 'img02', url: './images/1-02.jpg', name: '作品02' },
+      { id: 'img03', url: './images/1-03.jpg', name: '作品03' },
+      { id: 'img04', url: './images/1-04.jpg', name: '作品04' },
+      { id: 'img05', url: './images/1-05.jpg', name: '作品05' },
+      { id: 'img06', url: './images/1-06.jpg', name: '作品06' },
+      { id: 'img07', url: './images/1-07.jpg', name: '作品07' },
+      { id: 'img08', url: './images/1-08.jpg', name: '作品08' },
+      { id: 'img09', url: './images/1-09.jpg', name: '作品09' },
+      { id: 'img10', url: './images/1-10.jpg', name: '作品10' },
+      { id: 'img11', url: './images/1-11.jpg', name: '作品11' },
+      { id: 'img12', url: './images/1-12.jpg', name: '作品12' },
+      { id: 'img13', url: './images/1-13.jpg', name: '作品13' },
+      { id: 'img14', url: './images/1-14.jpg', name: '作品14' },
+      { id: 'img15', url: './images/1-15.jpg', name: '作品15' },
+      { id: 'img16', url: './images/1-16.jpg', name: '作品16' },
+      { id: 'img17', url: './images/1-17.jpg', name: '作品17' },
+      { id: 'img18', url: './images/1-18.jpg', name: '作品18' },
+      { id: 'img19', url: './images/1-19.jpg', name: '作品19' },
+      { id: 'img20', url: './images/1-20.jpg', name: '作品20' },
+      { id: 'img21', url: './images/1-21.jpg', name: '作品21' },
+      { id: 'img22', url: './images/1-22.jpg', name: '作品22' },
+      { id: 'img23', url: './images/1-23.jpg', name: '作品23' },
+      { id: 'img24', url: './images/1-24.jpg', name: '作品24' },
+      { id: 'img25', url: './images/1-25.jpg', name: '作品25' },
+      { id: 'img26', url: './images/1-26.jpg', name: '作品26' },
+      { id: 'img27', url: './images/1-27.jpg', name: '作品27' },
+      { id: 'img28', url: './images/1-28.jpg', name: '作品28' },
+      { id: 'img29', url: './images/1-29.jpg', name: '作品29' },
+      { id: 'img30', url: './images/1-30.jpg', name: '作品30' },
+      { id: 'img31', url: './images/1-31.jpg', name: '作品31' }
+    ];
+    // =========================================================================
+
+    const COLORS = { purple: '#D946EF', cyan: '#06B6D4', red: '#EF4444' };
+
+    // --- 骨灰级开屏动画 ---
+    const SplashIntro = ({ onComplete }) => {
+      const [stage, setStage] = useState(0);
+
+      useEffect(() => {
+        const t1 = setTimeout(() => setStage(1), 300);   
+        const t2 = setTimeout(() => setStage(2), 800);   
+        const t4 = setTimeout(() => setStage(4), 3600);  
+        const t5 = setTimeout(() => onComplete(), 4600); 
+
+        return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t4); clearTimeout(t5); };
+      }, []);
+
+      return (
+        <div className={`fixed inset-0 z-[999] flex items-center justify-center bg-black transition-opacity duration-1000 ease-in-out ${stage >= 4 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          <div className="flex flex-col items-center justify-center relative w-full max-w-lg">
+            <div className="overflow-hidden pb-4 w-full flex justify-center">
+              <div className={`transition-transform duration-1000 ease-out w-full flex justify-center ${stage >= 2 ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+                <svg width="100%" height="60" className="overflow-visible">
+                  <text
+                    x="50%"
+                    y="50%"
+                    dominantBaseline="central"
+                    textAnchor="middle"
+                    className="text-4xl md:text-5xl tracking-[0.15em] font-medium"
+                    style={{
+                      fill: stage >= 2 ? '#ffffff' : 'transparent', 
+                      stroke: 'rgba(255, 255, 255, 0.9)',
+                      strokeWidth: '1.2px',
+                      strokeDasharray: '400',
+                      strokeDashoffset: stage >= 2 ? '0' : '400',
+                      transition: 'stroke-dashoffset 2.0s ease-in-out, fill 0.4s ease-out 1.8s'
+                    }}
+                  >
+                    Donglin Work
+                  </text>
+                </svg>
+              </div>
+            </div>
+            <div className={`h-[1px] bg-white/40 transition-all duration-700 ease-in-out ${stage >= 1 ? 'w-3/4 opacity-100' : 'w-0 opacity-0'}`}></div>
+            <div className="overflow-hidden pt-4">
+              <p className={`text-zinc-500 font-mono text-xs tracking-[0.4em] uppercase transition-transform duration-1000 ease-out ${stage >= 2 ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+                Work Report
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 基础组件：流体渐变背景 ---
+    // 修改：增加 isFixed 参数，使得它既能全屏固定作为大背景，也能放在相对容器里作为页脚背景
+    const FluidBackground = ({ time, isFixed = true }) => {
+      return (
+        <div className={`${isFixed ? 'fixed' : 'absolute'} inset-0 pointer-events-none overflow-hidden z-0`}>
+          <div className="absolute inset-0 opacity-60 filter blur-[120px]">
+            <div className="absolute top-1/2 left-1/2 w-[70vw] h-[70vh] bg-blue-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.6) * 25}vw, ${Math.cos(time * 0.8) * 20}vh) scale(${1 + Math.sin(time * 1.0) * 0.2})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[60vw] h-[60vh] bg-purple-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 0.8) * -20}vw, ${Math.sin(time * 0.6) * 25}vh) scale(${1 + Math.cos(time * 0.8) * 0.1})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[65vw] h-[65vh] bg-red-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.sin(time * 0.4) * 30}vw, ${Math.cos(time * 1.0) * -25}vh) scale(${1 + Math.sin(time * 0.3) * 0.15})` }} />
+            <div className="absolute top-1/2 left-1/2 w-[55vw] h-[55vh] bg-orange-600 rounded-full" style={{ transform: `translate(-50%, -50%) translate(${Math.cos(time * 1.0) * -30}vw, ${Math.sin(time * 0.4) * -20}vh) scale(${1 + Math.cos(time * 0.8) * 0.2})` }} />
+          </div>
+        </div>
+      );
+    };
+
+    // --- 基础组件：Figma风格选中框 ---
+    const BoundingBox = ({ children, color, active = false }) => (
+      <div className="relative inline-block transition-all duration-500" style={{ boxShadow: active ? `0 0 0 1px ${color}` : 'none' }}>
+        {children}
+        <div className={`absolute -top-1 -left-1 w-2 h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
+        <div className={`absolute -top-1 -right-1 w-2 h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
+        <div className={`absolute -bottom-1 -left-1 w-2 h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
+        <div className={`absolute -bottom-1 -right-1 w-2 h-2 bg-white transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'}`} style={{ border: `1px solid ${color}` }}></div>
+      </div>
+    );
+
+    // --- 微件1：钢笔工具 ---
+    const PenToolWidget = ({ time, visible }) => {
+      const offset = Math.sin(time * 2); 
+      const cx = 80 + offset * 40; 
+      const cy = 30 + Math.cos(time * 2) * 20; 
+
+      return (
+        <div className={`absolute top-[20%] left-[10%] z-10 w-[160px] transition-all duration-1000 delay-[500ms] ease-out ${visible ? 'translate-y-0 opacity-100' : '-translate-y-12 opacity-0'}`}>
+          <div className="text-white font-mono text-[10px] mb-2">Pen Tool</div>
+          <div className="relative w-full h-[100px]">
+            <svg width="160" height="100" className="overflow-visible absolute top-0 left-0 z-0">
+              <path d={`M 20 80 C 60 80, ${cx} ${cy}, 140 80`} fill="transparent" stroke="#06B6D4" strokeWidth="2" />
+              <line x1="140" y1="80" x2={cx} y2={cy} stroke="#71717A" strokeWidth="1" strokeDasharray="2 2" />
+              <rect x="17" y="77" width="6" height="6" fill="white" stroke="#06B6D4" strokeWidth="1.5" />
+              <rect x="137" y="77" width="6" height="6" fill="white" stroke="#06B6D4" strokeWidth="1.5" />
+              <circle cx={cx} cy={cy} r="4" fill="white" stroke="#06B6D4" strokeWidth="1.5" />
+            </svg>
+            <div className="absolute pointer-events-none z-10" style={{ left: cx, top: cy, transform: 'translate(-2px, -2px)' }}>
+              <MousePointer2 size={18} color="#06B6D4" fill="#06B6D4" className="-rotate-12 drop-shadow-md" />
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 微件2：矩形数值输入 ---
+    const RectangleInputWidget = ({ time, visible }) => {
+      const cycle = time % 4; 
+      let text = cycle < 0.5 ? "19" : cycle < 0.8 ? "192" : cycle < 2.0 ? "1920" : cycle < 2.3 ? "192" : cycle < 2.5 ? "19" : cycle < 2.7 ? "1" : "";
+      const isBlinking = (time * 2) % 1 > 0.5;
+
+      return (
+        <div className={`absolute bottom-[20%] left-[15%] z-20 font-mono text-xs transition-all duration-1000 delay-[700ms] ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+          <div className="bg-white/[0.08] backdrop-blur-[2px] border border-white/20 rounded-md p-3 w-40 shadow-lg">
+            <div className="flex justify-between items-center text-white mb-3 text-[10px]"><span>Rectangle 1</span></div>
+            <div className="flex gap-2 mb-2">
+              <div className="bg-transparent border border-white/10 px-2 py-1.5 rounded w-full flex items-center text-white relative ring-1 ring-cyan-500/50">
+                <span className="text-white w-4">W</span>
+                <span>{text}</span>
+                <span className={`w-[2px] h-3.5 bg-cyan-400 ml-[1px] ${isBlinking ? 'opacity-100' : 'opacity-0'}`} />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <div className="bg-transparent border border-white/10 px-2 py-1.5 rounded w-full flex items-center text-white">
+                <span className="text-white w-4">H</span>
+                <span>1080</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 微件3：渐变滑块调整 ---
+    const GradientWidget = ({ time, visible }) => {
+      const progress = (Math.sin(time * 1.5) + 1) / 2; 
+      const trackWidth = 152; 
+      const thumbX = progress * (trackWidth - 16); 
+      
+      return (
+        <div className={`absolute bottom-[20%] right-[15%] z-20 font-mono text-xs transition-all duration-1000 delay-[1000ms] ease-out ${visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+          <div className="bg-white/[0.08] backdrop-blur-[2px] border border-white/20 p-3 rounded-md w-44 shadow-lg">
+            <div className="text-[10px] text-white mb-3 flex justify-between"><span>Fill</span><span>Linear</span></div>
+            <div className="h-6 w-full rounded-sm mb-4 border border-white/15 shadow-inner opacity-90" style={{ background: `linear-gradient(to right, #EF4444 ${progress * 100}%, #06B6D4)` }} />
+            <div className="relative h-2 bg-black/30 border border-white/10 rounded-full w-full mx-auto">
+              <div className="absolute top-1/2 -mt-2 -ml-2 w-4 h-4 bg-white rounded-full border-[3px] border-red-500 shadow-md z-10" style={{ left: 0 }} />
+              <div className="absolute top-1/2 -mt-2 -ml-2 w-4 h-4 bg-white rounded-full border-[3px] border-cyan-500 shadow-md z-20" style={{ left: thumbX }} />
+              <div className="absolute pointer-events-none z-30" style={{ left: thumbX, top: 4, transform: 'translate(-2px, -2px)' }}>
+                <MousePointer2 size={18} color="#06B6D4" fill="#06B6D4" className="-rotate-12 drop-shadow-md" />
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 核心更新：纯静态渲染的作品集展示板块 ---
+    const PortfolioWorksSection = () => {
+      const works = PRELOAD_WORKS;
+      const [activeImageIndex, setActiveImageIndex] = useState(null);
+      const containerRefs = useRef([]);
+
+      containerRefs.current = [];
+
+      // 全新外部弹性视差逻辑：不操作图片内部，只操作整个容器
+      useEffect(() => {
+        let reqId;
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.remove('opacity-0', 'scale-95');
+              entry.target.classList.add('opacity-100', 'scale-100');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        containerRefs.current.forEach(el => {
+          if (el) observer.observe(el);
+        });
+
+        const handleScroll = () => {
+          reqId = requestAnimationFrame(() => {
+            containerRefs.current.forEach((el) => {
+              if (el) {
+                const rect = el.getBoundingClientRect();
+                const viewHeight = window.innerHeight;
+                
+                if (rect.top <= viewHeight && rect.bottom >= 0) {
+                  const offset = (viewHeight / 2 - rect.top) * 0.05; 
+                  el.style.transform = `translateY(${offset}px)`;
+                }
+              }
+            });
+          });
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); 
+
+        return () => {
+          observer.disconnect();
+          window.removeEventListener('scroll', handleScroll);
+          cancelAnimationFrame(reqId);
+        };
+      }, [works]);
+
+      // Lightbox 键盘控制
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (activeImageIndex === null) return;
+          if (e.key === 'ArrowRight') setActiveImageIndex(prev => (prev + 1) % works.length);
+          else if (e.key === 'ArrowLeft') setActiveImageIndex(prev => (prev - 1 + works.length) % works.length);
+          else if (e.key === 'Escape') setActiveImageIndex(null);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [activeImageIndex, works.length]);
+
+      // --- 新增：放大查看时的全局防滚动锁 ---
+      useEffect(() => {
+        if (activeImageIndex !== null) {
+          // 锁定 CSS 滚动
+          document.body.style.overflow = 'hidden';
+          document.documentElement.style.overflow = 'hidden';
+
+          // 物理拦截滚动事件
+          const preventScroll = (e) => e.preventDefault();
+          const preventKeyScroll = (e) => {
+            // 屏蔽上下翻页键，但不屏蔽左右键(用于切换图片)和 Esc 键(用于关闭)
+            if (['Space', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.code)) {
+              e.preventDefault();
+            }
+          };
+
+          window.addEventListener('wheel', preventScroll, { passive: false });
+          window.addEventListener('touchmove', preventScroll, { passive: false });
+          window.addEventListener('keydown', preventKeyScroll, { passive: false });
+
+          // 弹窗关闭时，解除所有封印
+          return () => {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            window.removeEventListener('wheel', preventScroll);
+            window.removeEventListener('touchmove', preventScroll);
+            window.removeEventListener('keydown', preventKeyScroll);
+          };
+        }
+      }, [activeImageIndex]);
+
+      return (
+        <div className="relative z-10 w-full pt-4 pb-16 min-h-screen">
+          <div className="px-6 md:px-[12.5%] flex justify-between items-end mb-12 border-b border-white/10 pb-4">
+            <div>
+              <h2 className="text-white text-3xl font-black tracking-tighter mb-2">SELECTED WORKS</h2>
+              <p className="text-zinc-500 font-mono text-xs uppercase tracking-[0.3em]">Exhibition / Portfolio / 2026</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-16 md:gap-24 w-full">
+            {works.map((work, index) => (
+              <div 
+                key={work.id} 
+                ref={el => { if(el) containerRefs.current[index] = el; }}
+                className="relative w-full aspect-video opacity-0 scale-95 transition-all duration-1000 ease-out will-change-transform"
+              >
+                <div 
+                  className="w-full h-full cursor-pointer group overflow-hidden"
+                  onClick={() => setActiveImageIndex(index)}
+                >
+                  <img 
+                    src={work.url} 
+                    alt={work.name} 
+                    className="w-full h-full object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-[1.015]" 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* --- 全屏放大查看器 --- */}
+          {activeImageIndex !== null && works.length > 0 && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl transition-all duration-500" onClick={() => setActiveImageIndex(null)}>
+              <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors" onClick={() => setActiveImageIndex(null)}>
+                <X size={36} />
+              </button>
+              {works.length > 1 && (
+                <button className="absolute left-8 text-white/30 hover:text-white transition-colors p-4" onClick={(e) => { e.stopPropagation(); setActiveImageIndex((activeImageIndex - 1 + works.length) % works.length); }}>
+                  <ChevronLeft size={48} />
+                </button>
+              )}
+              <img src={works[activeImageIndex].url} alt={works[activeImageIndex].name} className="max-w-[90vw] max-h-[90vh] object-contain drop-shadow-2xl cursor-default" onClick={(e) => e.stopPropagation()} />
+              {works.length > 1 && (
+                <button className="absolute right-8 text-white/30 hover:text-white transition-colors p-4" onClick={(e) => { e.stopPropagation(); setActiveImageIndex((activeImageIndex + 1) % works.length); }}>
+                  <ChevronRight size={48} />
+                </button>
+              )}
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/50 font-mono text-xs tracking-[0.3em]">
+                {activeImageIndex + 1} / {works.length}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // --- 主应用 ---
+    function App() {
+      const [time, setTime] = useState(0);
+      const [introDone, setIntroDone] = useState(false);
+      const typingStartTime = useRef(null);
+
+      // 骨灰级防滚动锁：彻底禁止开屏期间的任何滚动行为
+      useEffect(() => {
+        if (!introDone) {
+          document.body.style.overflow = 'hidden';
+          document.documentElement.style.overflow = 'hidden';
+          window.scrollTo(0, 0); 
+
+          const preventScroll = (e) => e.preventDefault();
+          const preventKeyScroll = (e) => {
+            if (['Space', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.code)) {
+              e.preventDefault();
+            }
+          };
+
+          window.addEventListener('wheel', preventScroll, { passive: false });
+          window.addEventListener('touchmove', preventScroll, { passive: false });
+          window.addEventListener('keydown', preventKeyScroll, { passive: false });
+
+          return () => {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            window.removeEventListener('wheel', preventScroll);
+            window.removeEventListener('touchmove', preventScroll);
+            window.removeEventListener('keydown', preventKeyScroll);
+          };
+        }
+      }, [introDone]);
+
+      useEffect(() => {
+        let req;
+        const startTime = Date.now();
+        const tick = () => {
+          setTime((Date.now() - startTime) / 1000);
+          req = requestAnimationFrame(tick);
+        };
+        req = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(req);
+      }, []);
+
+      if (introDone && typingStartTime.current === null) {
+        typingStartTime.current = time;
+      }
+      
+      const typingTime = introDone ? (time - typingStartTime.current) : 0;
+      let globalCursorIndex = -1;
+      let showBoundingBox = false;
+
+      const charTypeInterval = 0.25; 
+      const fullTypingDoneTime = 7 * charTypeInterval; 
+      const fillDisappearTime = fullTypingDoneTime + 0.8; 
+      const boxAppearTime = fillDisappearTime + 0.5; 
+      const loopStartTime = boxAppearTime + 0.6; 
+
+      if (!introDone) {
+        globalCursorIndex = -1;
+        showBoundingBox = false;
+      } else if (typingTime < fullTypingDoneTime) {
+        globalCursorIndex = Math.floor(typingTime / charTypeInterval);
+        showBoundingBox = false;
+      } else if (typingTime < fillDisappearTime) {
+        globalCursorIndex = 7;
+        showBoundingBox = false;
+      } else if (typingTime < loopStartTime) {
+        globalCursorIndex = -1; 
+        showBoundingBox = typingTime > boxAppearTime;
+      } else {
+        showBoundingBox = true;
+        const loopTime = (typingTime - loopStartTime) % 3.0;
+        if (loopTime >= 2.5) {
+          globalCursorIndex = -1;
+        } else {
+          const loopCursor = Math.floor(loopTime / 0.25);
+          globalCursorIndex = 3 + Math.min(loopCursor, 4);
+        }
+      }
+
+      const isNameCharVisible = (i) => introDone && typingTime > (i + 1) * charTypeInterval;
+      const isNameCharFilled = (i) => isNameCharVisible(i);
+
+      const isTitleCharVisible = (i) => introDone && typingTime > (3 + i + 1) * charTypeInterval;
+      const isTitleCharFilled = (i) => {
+        if (!isTitleCharVisible(i)) return false;
+        if (typingTime < fillDisappearTime) return true; 
+        if (typingTime < loopStartTime) return false;    
+        const loopTime = (typingTime - loopStartTime) % 3.0;
+        return loopTime > (i + 1) * 0.25 && loopTime < 2.5;
+      };
+
+      const scrollToWorks = () => {
+        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+      };
+
+      return (
+        <div className="relative w-full bg-black selection:bg-purple-500/30 overflow-x-hidden">
+          
+          {!introDone && <SplashIntro onComplete={() => setIntroDone(true)} />}
+
+          {/* 首屏的流体背景 */}
+          <FluidBackground time={time} />
+
+          {/* --- 第一屏：Hero 动画 --- */}
+          <section className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+            
+            <div className="absolute top-6 left-8 flex items-center gap-3 z-20">
+              <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                <div className="w-2.5 h-2.5 rounded-full bg-black"></div>
+              </div>
+              <span className="text-white font-bold tracking-tight text-lg">Donglin.</span>
+            </div>
+
+            <div className="relative z-10 pointer-events-none text-center">
+              <div className={`text-white font-mono text-xs md:text-sm tracking-[0.2em] mb-4 uppercase transition-opacity duration-1000 ${introDone && typingTime > fullTypingDoneTime ? 'opacity-100' : 'opacity-0'}`}>
+                lidonglin the design work
+              </div>
+
+              <BoundingBox color={COLORS.red} active={showBoundingBox}>
+                <h1 className="text-6xl md:text-8xl lg:text-[120px] font-black tracking-tighter leading-none relative flex items-center">
+                  
+                  {globalCursorIndex === 0 && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                  
+                  {['李', '东', '霖'].map((char, i) => {
+                    const isVisible = isNameCharVisible(i);
+                    const isFilled = isNameCharFilled(i);
+                    return (
+                      <React.Fragment key={`name-${i}`}>
+                        <span
+                          className={isVisible ? 'opacity-100' : 'opacity-0'}
+                          style={{
+                            color: isFilled ? '#ffffff' : 'transparent',
+                            WebkitTextStroke: isFilled ? '2px #ffffff' : '2px #71717a',
+                            transition: 'color 500ms ease-in-out, -webkit-text-stroke 500ms ease-in-out'
+                          }}
+                        >
+                          {char}
+                        </span>
+                        {globalCursorIndex === i + 1 && i < 2 && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                      </React.Fragment>
+                    );
+                  })}
+
+                  <div className="w-2 md:w-4" />
+
+                  {globalCursorIndex === 3 && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                  
+                  {['述', '职', '报', '告'].map((char, i) => {
+                    const isVisible = isTitleCharVisible(i);
+                    const isFilled = isTitleCharFilled(i);
+                    return (
+                      <React.Fragment key={`title-${i}`}>
+                        <span
+                          className={isVisible ? 'opacity-100' : 'opacity-0'}
+                          style={{
+                            color: isFilled ? '#ffffff' : 'transparent',
+                            WebkitTextStroke: isFilled ? '2px #ffffff' : '2px #71717a',
+                            transition: 'color 500ms ease-in-out, -webkit-text-stroke 500ms ease-in-out'
+                          }}
+                        >
+                          {char}
+                        </span>
+                        {globalCursorIndex === 4 + i && <div className="w-1.5 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-1 md:mx-2 rounded-sm" />}
+                      </React.Fragment>
+                    );
+                  })}
+
+                </h1>
+              </BoundingBox>
+
+              <div className={`mt-4 relative inline-block transition-all duration-1000 delay-[1200ms] ease-out ${introDone ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+                 <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold tracking-tight text-transparent" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}>
+                   2026 Work Performance Report
+                 </h2>
+              </div>
+              
+              <div className={`mt-8 text-white font-mono text-xs transition-opacity duration-1000 ${introDone && typingTime > fullTypingDoneTime ? 'opacity-100' : 'opacity-0'}`}>
+                © 2026
+              </div>
+            </div>
+
+            <PenToolWidget time={time} visible={introDone} />
+            <RectangleInputWidget time={time} visible={introDone} />
+            <GradientWidget time={time} visible={introDone} />
+
+            <div 
+              className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer z-30 group transition-opacity duration-1000 delay-1000 ${introDone ? 'opacity-100' : 'opacity-0'}`}
+              onClick={scrollToWorks}
+            >
+              <span className="text-white font-mono text-[9px] uppercase tracking-[0.4em] transition-colors group-hover:text-white">向下滑动查看</span>
+              <div className="p-2 rounded-full border border-white/10 group-hover:border-white/30 transition-all group-hover:translate-y-1">
+                <ChevronDown className="text-white animate-bounce group-hover:text-white" size={20} />
+              </div>
+            </div>
+          </section>
+
+          {/* --- 第二屏及底部 --- */}
+          <div className="relative z-10">
+            {/* 顶部的遮罩背景，让光晕平滑过渡成纯黑 */}
+            <div className="absolute top-0 left-0 w-full h-[350px] bg-gradient-to-b from-transparent via-black/70 to-black pointer-events-none z-0"></div>
+            <div className="absolute top-[350px] left-0 w-full h-[calc(100%-350px)] bg-black pointer-events-none z-0"></div>
+            
+            {/* --- 新增：底部溢出流体 --- 
+                放置在图片 section 之前，z-index 为 0，确保被图片遮挡但能从两边透出。
+                h-[800px] 的高度刚好覆盖页脚，并向上延伸到最后一张图片的一半位置。
+            */}
+            <div className="absolute bottom-0 left-0 w-full h-[800px] pointer-events-none z-0 overflow-hidden">
+              {/* 顶部超长羽化遮罩：黑变透明，让溢出的光晕平滑消散，完美过渡 */}
+              <div className="absolute top-0 left-0 w-full h-[60%] bg-gradient-to-b from-black via-black/80 to-transparent z-10"></div>
+              <FluidBackground time={time} isFixed={false} />
+            </div>
+
+            <section className="relative w-full z-10">
+              <PortfolioWorksSection />
+            </section>
+
+            {/* --- 底部页脚区 --- */}
+            {/* 彻底移除背景黑和 overflow-hidden，让底下溢出的星云流体透出来 */}
+            <footer className="relative z-10 w-full flex flex-col">
+              <div className="relative z-20 w-full pt-16 pb-32 flex flex-col">
+                <div className="px-6 md:px-[12.5%] flex justify-between items-center text-white/60 font-mono text-[10px] uppercase tracking-[0.4em] pt-12 mb-32 drop-shadow-md">
+                  <span>///</span>
+                  <span>Portfolio 2026 Production</span>
+                </div>
+
+                <div className="text-center text-white/80 font-mono text-[8px] md:text-[10px] uppercase tracking-[0.3em] drop-shadow-md">
+                  Design Engineering by Donglin / Portfolio 2026
+                </div>
+              </div>
+            </footer>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
