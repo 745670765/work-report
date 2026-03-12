@@ -623,64 +623,69 @@
               <span className="text-white font-bold tracking-tight text-base md:text-lg">Donglin.</span>
             </div>
 
-            <div className="relative z-10 pointer-events-none text-center px-2">
+            {/* 新增：加入了 w-full 确保父容器占满宽度 */}
+            <div className="relative z-10 pointer-events-none text-center px-2 w-full">
               <div className={`text-white font-mono text-[10px] md:text-xs lg:text-sm tracking-[0.2em] mb-3 md:mb-4 uppercase transition-opacity duration-1000 ${introDone && typingTime > fullTypingDoneTime ? 'opacity-100' : 'opacity-0'}`}>
                 lidonglin the design work
               </div>
 
-              <BoundingBox color={COLORS.red} active={showBoundingBox}>
-                <h1 className="text-[8.5vw] md:text-8xl lg:text-[120px] font-black tracking-tighter leading-none relative flex items-center justify-center whitespace-nowrap">
-                  
-                  {globalCursorIndex === 0 && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
-                  
-                  {['李', '东', '霖'].map((char, i) => {
-                    const isVisible = isNameCharVisible(i);
-                    const isFilled = isNameCharFilled(i);
-                    return (
-                      <React.Fragment key={`name-${i}`}>
-                        <span
-                          className={isVisible ? 'opacity-100' : 'opacity-0'}
-                          style={{
-                            color: isFilled ? '#ffffff' : 'transparent',
-                            WebkitTextStroke: isFilled ? (window.innerWidth < 768 ? '1px #ffffff' : '2px #ffffff') : (window.innerWidth < 768 ? '1px #71717a' : '2px #71717a'),
-                            transition: 'color 500ms ease-in-out, -webkit-text-stroke 500ms ease-in-out'
-                          }}
-                        >
-                          {char}
-                        </span>
-                        {globalCursorIndex === i + 1 && i < 2 && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
-                      </React.Fragment>
-                    );
-                  })}
+              {/* 新增：外层加入 w-full flex justify-center，强制占满整行并居中，防止和下方文字挤到一起 */}
+              <div className="w-full flex justify-center">
+                <BoundingBox color={COLORS.red} active={showBoundingBox}>
+                  <h1 className="text-[8.5vw] md:text-8xl lg:text-[120px] font-black tracking-tighter leading-none relative flex items-center justify-center whitespace-nowrap">
+                    
+                    {globalCursorIndex === 0 && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
+                    
+                    {['李', '东', '霖'].map((char, i) => {
+                      const isVisible = isNameCharVisible(i);
+                      const isFilled = isNameCharFilled(i);
+                      return (
+                        <React.Fragment key={`name-${i}`}>
+                          <span
+                            className={isVisible ? 'opacity-100' : 'opacity-0'}
+                            style={{
+                              color: isFilled ? '#ffffff' : 'transparent',
+                              WebkitTextStroke: isFilled ? (window.innerWidth < 768 ? '1px #ffffff' : '2px #ffffff') : (window.innerWidth < 768 ? '1px #71717a' : '2px #71717a'),
+                              transition: 'color 500ms ease-in-out, -webkit-text-stroke 500ms ease-in-out'
+                            }}
+                          >
+                            {char}
+                          </span>
+                          {globalCursorIndex === i + 1 && i < 2 && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
+                        </React.Fragment>
+                      );
+                    })}
 
-                  <div className="w-1.5 md:w-4" />
+                    <div className="w-1.5 md:w-4" />
 
-                  {globalCursorIndex === 3 && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
-                  
-                  {['述', '职', '报', '告'].map((char, i) => {
-                    const isVisible = isTitleCharVisible(i);
-                    const isFilled = isTitleCharFilled(i);
-                    return (
-                      <React.Fragment key={`title-${i}`}>
-                        <span
-                          className={isVisible ? 'opacity-100' : 'opacity-0'}
-                          style={{
-                            color: isFilled ? '#ffffff' : 'transparent',
-                            WebkitTextStroke: isFilled ? (window.innerWidth < 768 ? '1px #ffffff' : '2px #ffffff') : (window.innerWidth < 768 ? '1px #71717a' : '2px #71717a'),
-                            transition: 'color 500ms ease-in-out, -webkit-text-stroke 500ms ease-in-out'
-                          }}
-                        >
-                          {char}
-                        </span>
-                        {globalCursorIndex === 4 + i && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
-                      </React.Fragment>
-                    );
-                  })}
+                    {globalCursorIndex === 3 && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
+                    
+                    {['述', '职', '报', '告'].map((char, i) => {
+                      const isVisible = isTitleCharVisible(i);
+                      const isFilled = isTitleCharFilled(i);
+                      return (
+                        <React.Fragment key={`title-${i}`}>
+                          <span
+                            className={isVisible ? 'opacity-100' : 'opacity-0'}
+                            style={{
+                              color: isFilled ? '#ffffff' : 'transparent',
+                              WebkitTextStroke: isFilled ? (window.innerWidth < 768 ? '1px #ffffff' : '2px #ffffff') : (window.innerWidth < 768 ? '1px #71717a' : '2px #71717a'),
+                              transition: 'color 500ms ease-in-out, -webkit-text-stroke 500ms ease-in-out'
+                            }}
+                          >
+                            {char}
+                          </span>
+                          {globalCursorIndex === 4 + i && <div className="w-1 md:w-2.5 h-[0.8em] bg-red-500 animate-pulse mx-0.5 md:mx-2 rounded-sm" />}
+                        </React.Fragment>
+                      );
+                    })}
 
-                </h1>
-              </BoundingBox>
+                  </h1>
+                </BoundingBox>
+              </div>
 
-              <div className={`mt-3 md:mt-4 relative inline-block transition-all duration-1000 delay-[1200ms] ease-out ${introDone ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+              {/* 修改：将 inline-block 改为了 w-full flex justify-center */}
+              <div className={`mt-3 md:mt-4 relative w-full flex justify-center transition-all duration-1000 delay-[1200ms] ease-out ${introDone ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
                  <h2 className="text-[4.5vw] md:text-5xl lg:text-7xl font-bold tracking-tight text-transparent whitespace-nowrap" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.2)' }}>
                    2026 Work Performance Report
                  </h2>
