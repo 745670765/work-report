@@ -245,7 +245,11 @@
     const PortfolioWorksSection = memo(() => {
       const works = PRELOAD_WORKS;
       const [activeImageIndex, setActiveImageIndex] = useState(null);
+      
+      // 核心修复：分离三大图层 Ref，彻底解决滚动位置计算的反馈循环误差
       const containerRefs = useRef([]);
+      const parallaxRefs = useRef([]);
+      const fadeRefs = useRef([]);
       
       const [dragOffset, setDragOffset] = useState(0);
       const [isDragging, setIsDragging] = useState(false);
@@ -255,7 +259,10 @@
       const isSwipingRef = useRef(false);
       const dragTimerRef = useRef(null);
 
+      // 确保每次渲染重置
       containerRefs.current = [];
+      parallaxRefs.current = [];
+      fadeRefs.current = [];
 
       const prevIndex = activeImageIndex !== null ? (activeImageIndex - 1 + works.length) % works.length : null;
       const nextIndex = activeImageIndex !== null ? (activeImageIndex + 1) % works.length : null;
@@ -272,20 +279,24 @@
           });
         }, { threshold: 0.1 });
 
-        containerRefs.current.forEach(el => {
+        // 观察最内层的淡入元素
+        fadeRefs.current.forEach(el => {
           if (el) observer.observe(el);
         });
 
         const handleScroll = () => {
           reqId = requestAnimationFrame(() => {
-            containerRefs.current.forEach((el) => {
+            containerRefs.current.forEach((el, i) => {
               if (el) {
+                // 使用绝对静止的外层容器计算位置，杜绝坐标污染和漂移
                 const rect = el.getBoundingClientRect();
                 const viewHeight = window.innerHeight;
                 if (rect.top <= viewHeight && rect.bottom >= 0) {
-                  // 使用 translate3d 开启硬件加速
                   const offset = (viewHeight / 2 - rect.top) * 0.05; 
-                  el.style.transform = `translate3d(0, ${offset}px, 0)`;
+                  // 将位移应用到中间的纯净视差层
+                  if (parallaxRefs.current[i]) {
+                    parallaxRefs.current[i].style.transform = `translate3d(0, ${offset}px, 0)`;
+                  }
                 }
               }
             });
@@ -400,24 +411,37 @@
             </div>
           </div>
 
-          <div className="flex flex-col gap-8 md:gap-24 w-full">
+          {/* 适配修复：移动端减小基础间隙 (gap-2)，配合图层分离，彻底消灭底部断层间距 */}
+          <div className="flex flex-col gap-2 md:gap-24 w-full">
             {works.map((work, index) => (
+              // 1. 外层：负责定位和精准测量坐标，绝对静止
               <div 
                 key={work.id} 
                 ref={el => { if(el) containerRefs.current[index] = el; }}
-                // 性能优化：去除了手机端的 will-change-transform，防止占用大量显存导致崩溃卡顿
-                className="relative w-full aspect-video opacity-0 scale-95 transition-all duration-1000 ease-out"
+                className="relative w-full aspect-video"
               >
+                {/* 2. 中层：纯净视差层，只接收 transform，不带任何 transition，顺滑不卡顿 */}
                 <div 
-                  className="w-full h-full cursor-pointer group overflow-hidden"
-                  onClick={() => setActiveImageIndex(index)}
+                  ref={el => { if(el) parallaxRefs.current[index] = el; }}
+                  className="w-full h-full md:will-change-transform"
                 >
-                  <img 
-                    src={work.url} 
-                    alt={work.name} 
-                    className="w-full h-full object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-[1.015]" 
-                    loading="lazy" // 性能优化：给非首屏图片添加原生懒加载
-                  />
+                  {/* 3. 内层：淡入动画层，只负责开场的透明度和缩放 */}
+                  <div 
+                    ref={el => { if(el) fadeRefs.current[index] = el; }}
+                    className="w-full h-full opacity-0 scale-95 transition-all duration-1000 ease-out"
+                  >
+                    <div 
+                      className="w-full h-full cursor-pointer group overflow-hidden"
+                      onClick={() => setActiveImageIndex(index)}
+                    >
+                      <img 
+                        src={work.url} 
+                        alt={work.name} 
+                        className="w-full h-full object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-[1.015]" 
+                        loading="lazy" 
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
